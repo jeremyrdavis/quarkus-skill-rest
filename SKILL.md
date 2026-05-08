@@ -13,6 +13,19 @@ description: >
 Conventions for writing JAX-RS endpoints in Quarkus. Resources are thin: validate input, delegate to an
 application service, translate the result into an HTTP response. They never contain business logic.
 
+**Foundational principle.** If a resource method has more than five lines or a `try/catch`, the logic belongs in the application service. The resource is one of N callers — tests, schedulers, gRPC adapters, batch importers — never the only one. Domain rules placed here drift the moment a second caller appears, and HTTP-layer policy enforcement that's "only three lines" is exactly the bug compliance rules exist to prevent.
+
+**Red Flags — STOP if you find yourself thinking:**
+
+- About to write `try { ... } catch (DomainException ...) { ... }` in a resource method.
+- About to inline a domain rule (amount threshold, role check, state-machine guard) before delegating.
+- Hand-rolling `if (x == null) return Response.status(400)` instead of `@Valid` / `@NotNull` / `@NotBlank`.
+- About to return the entity / DTO directly instead of `Response`.
+- About to throw `WebApplicationException(404)` instead of a domain exception + `@Provider ExceptionMapper`.
+- "It's only three lines — putting it in the resource is cheaper than threading it through the service."
+
+If any of these surface, re-read Core Rules and Excuse / Reality before typing.
+
 ---
 
 ## When to Use
@@ -173,6 +186,8 @@ When you catch yourself reasoning around the rules above, look here before you t
 | "Two paths — `/orders` and `/api/orders` — won't matter; we'll standardize next sprint." | Frontend bookmarks, monitoring dashboards, rate-limit rules, and customer integrations latch onto whichever path ships first. Two paths is forever. Pick one the first time. |
 | "I'll wrap a `try/catch` in this resource just for this one exception." | One `try/catch` becomes the template. Three resources later, HTTP-status decisions are scattered across every method instead of consolidated in one `ExceptionMapper`. |
 | "It's a quick demo endpoint; it doesn't need DTO mapping." | Demos go to production. The "quick demo endpoint" is the one the executive remembers and the team forgets to refactor. |
+| "HTTP concepts shouldn't leak into the domain — the resource has to handle the auth header / token / threshold check." | The token is an HTTP artifact; the rule "refunds over $X require approval" is domain policy. Don't conflate the carrier with the rule. The service receives the token as an opaque credential and validates it; the resource just passes it through. Keeping policy at the boundary means it drifts the moment a non-HTTP caller (test, scheduler, gRPC, batch) appears. |
+| "It's only three lines — putting the check in the resource is cheaper than threading a parameter through the service." | "Only three lines" duplicated across every caller — or worse, forgotten in one — is exactly the bug compliance rules exist to prevent. The resource is one of N entry points, not the only one. The cheap-now choice is the silent-drift choice. |
 
 ---
 
