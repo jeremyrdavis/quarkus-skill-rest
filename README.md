@@ -23,16 +23,14 @@ The skill is a single `SKILL.md` file with YAML frontmatter. Drop the directory 
 User-level (active across every project):
 
 ```bash
-git clone https://github.com/<your-org>/quarkus-rest.git ~/.claude/skills/quarkus-rest
+git clone https://github.com/jeremyrdavis/quarkus-skill-rest.git ~/.claude/skills/quarkus-rest
 ```
 
 Project-level (active only in one project):
 
 ```bash
-git clone https://github.com/<your-org>/quarkus-rest.git <your-project>/.claude/skills/quarkus-rest
+git clone https://github.com/jeremyrdavis/quarkus-skill-rest.git <your-project>/.claude/skills/quarkus-rest
 ```
-
-Replace `<your-org>` with the GitHub owner once the repo is published.
 
 ### Other agents
 
@@ -60,9 +58,9 @@ If you want to broaden or narrow that trigger, edit the `description:` field —
 
 This skill pairs naturally with:
 
-- **[quarkus-logging](https://github.com/<your-org>/quarkus-logging)** — for the log calls inside resource methods and exception mappers.
-- **[quarkus-testing](https://github.com/<your-org>/quarkus-testing)** — for `@QuarkusTest` against the resource, REST Assured assertions on status and body.
-- **[quarkus-persistence](https://github.com/<your-org>/quarkus-persistence)** — for the application service the resource delegates to.
+- **[quarkus-logging](https://github.com/jeremyrdavis/quarkus-skill-logging)** — for the log calls inside resource methods and exception mappers.
+- **[quarkus-testing](https://github.com/jeremyrdavis/quarkus-skill-testing)** — for `@QuarkusTest` against the resource, REST Assured assertions on status and body.
+- **[quarkus-persistence](https://github.com/jeremyrdavis/quarkus-skill-persistence)** — for the application service the resource delegates to.
 
 ## Authoring methodology
 
